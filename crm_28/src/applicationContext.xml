@@ -75,7 +75,11 @@
 	</bean>
 	
 	<bean id="userService" class="com.itheima.service.UserServiceImpl">
+		<property name="userDao" ref="userDao"/>
+	</bean>
 	
+	<bean id="userDao" class="com.itheima.dao.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
 	</bean>
 	
 </beans>
