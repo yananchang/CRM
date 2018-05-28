@@ -39,6 +39,8 @@
 		<property name="mappingResources">
 			<list>
 				<value>com/itheima/domain/User.hbm.xml</value>
+				<value>com/itheima/domain/Customer.hbm.xml</value>
+				<value>com/itheima/domain/Dict.hbm.xml</value>
 			</list>
 		</property>
 	</bean>
@@ -52,7 +54,7 @@
 	<tx:annotation-driven transaction-manager="transactionManager"/>
 	
 	<!-- 配置客户模块 -->
-	<!-- <bean id="customerAction" class="com.itheima.web.action.CustomerAction" scope="prototype">
+	<bean id="customerAction" class="com.itheima.web.action.CustomerAction" scope="prototype">
 		<property name="customerService" ref="customerService"/>
 	</bean>
 	
@@ -60,10 +62,10 @@
 		<property name="customerDao" ref="customerDao"/>
 	</bean>
 	
-	以后：Dao都需要继承HibernateDaoSupport，注入sessionFactory
+	<!-- 以后：Dao都需要继承HibernateDaoSupport，注入sessionFactory -->
 	<bean id="customerDao" class="com.itheima.dao.CustomerDaoImpl">
 		<property name="sessionFactory" ref="sessionFactory"/>
-	</bean> -->
+	</bean> 
 	
 	<!-- <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
 		<property name="sessionFactory"></property>
@@ -81,6 +83,21 @@
 	<bean id="userDao" class="com.itheima.dao.UserDaoImpl">
 		<property name="sessionFactory" ref="sessionFactory"/>
 	</bean>
+	
+	<!-- 字典 -->
+	<bean id="dictAction" class="com.itheima.web.action.DictAction" scope="prototype">
+		<property name="dictService" ref="dictService"/>
+	</bean>
+	
+	<bean id="dictService" class="com.itheima.service.DictServiceImpl">
+		<property name="dictDao" ref="dictDao"/>
+	</bean>
+	
+	<bean id="dictDao" class="com.itheima.dao.DictDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	
 	
 </beans>
 

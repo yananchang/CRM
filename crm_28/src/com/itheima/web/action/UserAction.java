@@ -36,9 +36,9 @@ public class UserAction extends ActionSupport implements ModelDriven<User>{
 	 * @return
 	 */
 	public String regist() {
-		System.out.println("register....");
-		
-		return NONE;
+		//接收请求参数
+		userService.save(user);
+		return LOGIN;
 	}
 	
 	/**
@@ -65,10 +65,53 @@ public class UserAction extends ActionSupport implements ModelDriven<User>{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		
-		
 		return NONE;
 	}
 
+	/**
+	 * 登录功能
+	 * @return
+	 */
+	public String login() {
+		User existUser = userService.login(user);
+		//判断,登录名或者密码错误了
+		if(existUser == null) {
+			return LOGIN;
+		}else {
+			ServletActionContext.getRequest().getSession().setAttribute("existUser", existUser);
+			
+			//登录成功
+			return "loginOK";
+			
+		}
+	}
+	
+	/**
+	 * 退出功能
+	 * @return
+	 */
+	public String exit() {
+		ServletActionContext.getRequest().getSession().removeAttribute("existUser");
+		return LOGIN;
+	}
+	
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

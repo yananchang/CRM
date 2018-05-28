@@ -9,8 +9,9 @@
 <LINK href="${pageContext.request.contextPath }/css/Style.css" type=text/css rel=stylesheet>
 <LINK href="${pageContext.request.contextPath }/css/Manage.css" type=text/css
 	rel=stylesheet>
-<script type="text/javascript" src="${pageContext.request.contextPath }/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath }/js/jquery-1.11.3.min.js"></script>
 <SCRIPT language=javascript>
+	//提交分页查询的表单
 	function to_page(page){
 		if(page){
 			$("#page").val(page);
@@ -18,14 +19,53 @@
 		document.customerForm.submit();
 		
 	}
+	
+	//页面的加载
+	$(function(){
+		//发送ajax的请求
+		var url = "${pageContext.request.contextPath}/dict_findByCode.action";
+		var param = {"dict_type_code":"006"};
+		$.post(url, param, function(data){
+			//遍历
+			$(data).each(function(i,n){
+				
+				//先获取值栈中的值, 使用EL表达式
+				var vsId= "${model.level.dict_id}";
+				//值栈中的id值和遍历的id值相同,让被选中
+				if(vsId == n.dict_id){
+					//JQuery的DOM操作
+					$("#levelId").append("<option value='"+n.dict_id+"' selected>"+ n.dict_item_name +"</option>");
+				}else{
+					$("#levelId").append("<option value='"+n.dict_id+"'>"+ n.dict_item_name +"</option>");
+				}
+				
+			});
+		},"json");
+		
+		//获取来源
+		var param = {"dict_type_code":"002"};
+		$.post(url, param, function(data){
+			//遍历
+			$(data).each(function(i,n){
+				var vsId= "${model.source.dict_id}";
+
+				if(vsId == n.dict_id){
+					//JQuery的DOM操作
+					$("#sourceId").append("<option value='"+n.dict_id+"' selected>"+ n.dict_item_name +"</option>");
+				}else{
+					$("#sourceId").append("<option value='"+n.dict_id+"'>"+ n.dict_item_name +"</option>");
+				}
+			});
+		},"json");
+		
+		
+	});
 </SCRIPT>
 
 <META content="MSHTML 6.00.2900.3492" name=GENERATOR>
 </HEAD>
 <BODY>
-	<FORM id="customerForm" name="customerForm"
-		action="${pageContext.request.contextPath }/customerServlet?method=list"
-		method=post>
+	<FORM id="customerForm" name="customerForm" action="${pageContext.request.contextPath }/customer_findByPage.action" method=post>
 		
 		<TABLE cellSpacing=0 cellPadding=0 width="98%" border=0>
 			<TBODY>
@@ -62,8 +102,23 @@
 											<TBODY>
 												<TR>
 													<TD>客户名称：</TD>
-													<TD><INPUT class=textbox id=sChannel2
-														style="WIDTH: 80px" maxLength=50 name="custName"></TD>
+													<TD>
+														<INPUT class=textbox id=sChannel2 style="WIDTH: 80px" maxLength=50 name="cust_name" value="${model.cust_name }">
+													</TD>
+													
+													<td>客户级别</td>
+													<td>
+														<select name="level.dict_id" id="levelId">
+															<option value="">--请选择--</option>
+														</select>
+													</td>
+													
+													<td>客户来源</td>
+													<td>
+														<select name="source.dict_id" id="sourceId">
+															<option value="">--请选择--</option>
+														</select>
+													</td>
 													
 													<TD><INPUT class=button id=sButton2 type=submit
 														value=" 筛选 " name=sButton2></TD>
@@ -89,19 +144,22 @@
 													<TD>手机</TD>
 													<TD>操作</TD>
 												</TR>
-												<c:forEach items="${list }" var="customer">
+												<c:forEach items="${page.beanList }" var="customer">
 												<TR
 													style="FONT-WEIGHT: normal; FONT-STYLE: normal; BACKGROUND-COLOR: white; TEXT-DECORATION: none">
-													<TD>${customer.custName }</TD>
-													<TD>${customer.custLevel }</TD>
-													<TD>${customer.custSource }</TD>
+													<TD>${customer.cust-name }</TD>
+													
+													<TD>${customer.level.dict_item_name }</TD>
+													<TD>${customer.source.dict_item_name }</TD>
+													
 													<TD>${customer.custLinkman }</TD>
-													<TD>${customer.custPhone }</TD>
-													<TD>${customer.custMobile }</TD>
+													
+													<TD>${customer.cust_phone }</TD>
+													<TD>${customer.cust_mobile }</TD>
 													<TD>
-													<a href="${pageContext.request.contextPath }/customerServlet?method=edit&custId=${customer.custId}">修改</a>
+													<a href="${pageContext.request.contextPath }/customerServlet?method=edit&custId=${customer.cust_id}">修改</a>
 													&nbsp;&nbsp;
-													<a href="${pageContext.request.contextPath }/customerServlet?method=delete&custId=${customer.custId}">删除</a>
+													<a href="${pageContext.request.contextPath }/customer_delete.action?cust_id=${customer.cust_id}" onclick="return window.confirm('确定删除吗?')">删除</a>
 													</TD>
 												</TR>
 												
@@ -113,27 +171,38 @@
 								</TR>
 								
 								<TR>
-									<TD><SPAN id=pagelink>
+									<TD>
+										<SPAN id=pagelink>
 											<DIV
 												style="LINE-HEIGHT: 20px; HEIGHT: 20px; TEXT-ALIGN: right">
-												共[<B>${total}</B>]条记录,[<B>${totalPage}</B>]页
+												共[<B>${page.totalCount}</B>]条记录,共[<B>${page.totalPage}</B>]页
 												,每页显示
 												<select name="pageSize">
 												
-												<option value="15" <c:if test="${pageSize==1 }">selected</c:if>>1</option>
-												<option value="30" <c:if test="${pageSize==30 }">selected</c:if>>30</option>
+													<option value="2" <c:if test="${page.pageSize==2}">selected</c:if>>2</option>
+													<option value="3" <c:if test="${page.pageSize==3 }">selected</c:if>>3</option>
 												</select>
+												
 												条
-												[<A href="javascript:to_page(${page-1})">前一页</A>]
-												<B>${page}</B>
-												[<A href="javascript:to_page(${page+1})">后一页</A>] 
+												
+												<c:if test="${page.pageCode > 1}">
+													[<A href="javascript:to_page(${page.pageCode-1})">前一页</A>]
+												</c:if>
+												
+												<B>${page.pageCode}</B>
+												
+												<c:if test="${page.pageCode < page.totalPage }">
+													[<A href="javascript:to_page(${page.pageCode+1})">后一页</A>] 
+												</c:if>
+												
 												到
-												<input type="text" size="3" id="page" name="page" />
+												<input type="text" size="3" id="page" name="pageCode" />
 												页
 												
 												<input type="button" value="Go" onclick="to_page()"/>
 											</DIV>
-									</SPAN></TD>
+										</SPAN>
+									</TD>
 								</TR>
 							</TBODY>
 						</TABLE>
