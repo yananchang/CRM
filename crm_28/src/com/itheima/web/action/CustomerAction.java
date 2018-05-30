@@ -2,8 +2,12 @@ package com.itheima.web.action;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.struts2.ServletActionContext;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 
@@ -11,6 +15,7 @@ import com.itheima.domain.Customer;
 import com.itheima.domain.Dict;
 import com.itheima.domain.PageBean;
 import com.itheima.service.CustomerService;
+import com.itheima.utils.FastJsonUtil;
 import com.itheima.utils.UploadUtils;
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionSupport;
@@ -178,7 +183,55 @@ public class CustomerAction extends ActionSupport implements ModelDriven<Custome
 		return "delete";
 	}
 	
+	/**
+	 * 跳转到初始化修改的页面
+	 * @return
+	 */
+	public String initUpdate() {
+		//默认 customer压栈的了,Action默认压栈, model是Action类的属性, getModel(返回customer对象)
+		customer = customerService.findById(customer.getCust_id());
+		return "initUpdate";
+	}
 	
+	/**
+	 * 修改客户的功能
+	 * @throws IOException 
+	 */
+	public String update() throws IOException {
+		//判断, 不为null说明客户上传了新的图片
+		if(uploadFileName != null) {
+			//先删除旧的图片
+			String oldFilepath = customer.getFilepath();
+			if(oldFilepath != null && !oldFilepath.trim().isEmpty()) {
+				//说明,旧的路径存在,删除图片
+				File f = new File(oldFilepath);
+				f.delete();
+			}
+			//上传新的图片
+			//先处理文件的名称的问题
+			String uuidName = UploadUtils.getUUIDName(uploadFileName);
+			String path = "C:\\tomcat7\\webapps\\upload\\";
+			File file = new File(path+uuidName);
+			FileUtils.copyFile(upload, file);
+			//把客户新图片的路径更新到数据库中
+			customer.setFilepath(path+uuidName);
+		}
+		//更新客户的信息就ok了
+		customerService.update(customer);
+		
+		return "update";
+	}
+	/**
+	 * 查询所有的客户
+	 */
+	public String findAll() {
+		List<Customer> list = customerService.findAll();
+		//穿换成json
+		String jsonString = FastJsonUtil.toJSONString(list);
+		HttpServletResponse response = ServletActionContext.getResponse();
+		FastJsonUtil.write_json(response, jsonString);
+		return NONE;
+	}
 	
 }
 

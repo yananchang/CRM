@@ -1,5 +1,7 @@
 package com.itheima.service;
 
+import java.util.List;
+
 import org.hibernate.criterion.DetachedCriteria;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +45,14 @@ public class CustomerServiceImpl implements CustomerService {
 	
 	public void delete(Customer customer) {
 		customerDao.delete(customer);
+	}
+
+	public void update(Customer customer) {
+		customerDao.update(customer);
+	}
+
+	public List<Customer> findAll() {
+		return customerDao.findAll();
 	}
 
 }

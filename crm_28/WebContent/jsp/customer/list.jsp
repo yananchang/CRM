@@ -157,7 +157,7 @@
 													<TD>${customer.cust_phone }</TD>
 													<TD>${customer.cust_mobile }</TD>
 													<TD>
-													<a href="${pageContext.request.contextPath }/customerServlet?method=edit&custId=${customer.cust_id}">修改</a>
+													<a href="${pageContext.request.contextPath }/customer_initUpdate.action?cust_id=${customer.cust_id}">修改</a>
 													&nbsp;&nbsp;
 													<a href="${pageContext.request.contextPath }/customer_delete.action?cust_id=${customer.cust_id}" onclick="return window.confirm('确定删除吗?')">删除</a>
 													</TD>
@@ -172,36 +172,8 @@
 								
 								<TR>
 									<TD>
-										<SPAN id=pagelink>
-											<DIV
-												style="LINE-HEIGHT: 20px; HEIGHT: 20px; TEXT-ALIGN: right">
-												共[<B>${page.totalCount}</B>]条记录,共[<B>${page.totalPage}</B>]页
-												,每页显示
-												<select name="pageSize">
-												
-													<option value="2" <c:if test="${page.pageSize==2}">selected</c:if>>2</option>
-													<option value="3" <c:if test="${page.pageSize==3 }">selected</c:if>>3</option>
-												</select>
-												
-												条
-												
-												<c:if test="${page.pageCode > 1}">
-													[<A href="javascript:to_page(${page.pageCode-1})">前一页</A>]
-												</c:if>
-												
-												<B>${page.pageCode}</B>
-												
-												<c:if test="${page.pageCode < page.totalPage }">
-													[<A href="javascript:to_page(${page.pageCode+1})">后一页</A>] 
-												</c:if>
-												
-												到
-												<input type="text" size="3" id="page" name="pageCode" />
-												页
-												
-												<input type="button" value="Go" onclick="to_page()"/>
-											</DIV>
-										</SPAN>
+										<!-- 使用靜態引入 -->
+										<% include file="/jsp/page.jsp" %>
 									</TD>
 								</TR>
 							</TBODY>
